@@ -1,20 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { Button, Text, View } from 'react-native';
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
 
-export default function App() {
+WebBrowser.maybeCompleteAuthSession();
+
+const redirectUri = AuthSession.makeRedirectUri();
+
+console.log('redirectUri', redirectUri)
+
+export default function Auth() {
+  const discovery = AuthSession.useAutoDiscovery('https://nci2y1.logto.app/oidc');
+ 
+	// Create and load an auth request
+  const [request, result, promptAsync] = AuthSession.useAuthRequest(
+    {
+			usePKCE: true,
+			codeChallengeMethod: AuthSession.CodeChallengeMethod.S256,
+      clientId: 'wee3ntpyuq5nq7tsmts8g',
+      redirectUri,
+      scopes: ['openid', 'profile', 'email', 'offline_access'],
+    },
+    discovery
+  );
+
+	console.log('result', result);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button title="Login!" disabled={!request} onPress={() => promptAsync()} />
+      {result && <Text>{JSON.stringify(result, null, 2)}</Text>}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
