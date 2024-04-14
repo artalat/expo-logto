@@ -22,7 +22,8 @@ export default function Auth() {
       clientId: CLIENT_ID,
       redirectUri,
       scopes: SCOPES,
-    },
+		  prompt: AuthSession.Prompt.Consent,
+  },
     discovery
   );
 
